@@ -1,0 +1,9 @@
+**/*.apk
+**/*.aab
+**/*.rar
+.vs/
+[Oo]bj/
+[Ll]ogs/
+[Bb]uilds/
+[Ll]ibrary/
+[Uu]serSettings/
