@@ -15,7 +15,7 @@ public class CameraHolder : MonoBehaviour {
 
 	private Camera zCamera;
 	private Transform target;
-	private bool is2D;
+	private bool in2DMode;
 
 	public void InitializeSelf() {
 		I = this;
@@ -26,20 +26,29 @@ public class CameraHolder : MonoBehaviour {
 		target = BirdController.I.transform;
 	}
 
+	public void Setup() {
+		in2DMode = GameController.In2DMode;
+		if (in2DMode) {
+			SetTo2DView();
+		} else {
+			SetTo3DView();
+		}
+	}
+
 	private void SetTo2DView() {
-		zCamera.orthographic = is2D = true;
+		zCamera.orthographic = in2DMode = true;
 		transform.position = target.position + offset2D;
 		transform.rotation = Quaternion.LookRotation(offset2D.To(viewpointOffset2D), Vector3.up);
 	}
 
 	private void SetTo3DView() {
-		zCamera.orthographic = is2D = false;
+		zCamera.orthographic = in2DMode = false;
 		transform.position = target.position + offset3D;
 		transform.rotation = Quaternion.LookRotation(offset3D.To(viewpointOffset3D), Vector3.up);
 	}
 
 	private void LateUpdate() {
-		if (is2D) {
+		if (in2DMode) {
 			transform.position = transform.position.SetZ(target.position.z + offset2D.z);
 			transform.rotation = Quaternion.LookRotation(offset2D.To(viewpointOffset2D), Vector3.up);
 		} else {
@@ -47,6 +56,7 @@ public class CameraHolder : MonoBehaviour {
 			transform.rotation = Quaternion.LookRotation(offset3D.To(viewpointOffset3D), Vector3.up);
 		}
 	}
+
 #if UNITY_EDITOR
 	public void EditorOnInspectorGUI() {
 		if (GUILayout.Button("InitializeSelf")) {
@@ -72,13 +82,13 @@ public class CameraHolder : MonoBehaviour {
 		if (target != null) {
 			bool changed = false;
 			Handles.color = Color.red;
-			Vector3 viewpoint = target.position + (is2D ? viewpointOffset2D : viewpointOffset3D);
+			Vector3 viewpoint = target.position + (in2DMode ? viewpointOffset2D : viewpointOffset3D);
 			EditorGUI.BeginChangeCheck();
 			viewpoint = Handles.FreeMoveHandle(viewpoint, Quaternion.identity, 0.1f, Vector3.zero, Handles.SphereHandleCap);
 			if (EditorGUI.EndChangeCheck()) {
 				Vector3 viewpointOffset = viewpoint - target.position;
 				Undo.RecordObject(this, "Viewpoint Offset");
-				if (is2D) { viewpointOffset2D = viewpointOffset; } else { viewpointOffset3D = viewpointOffset; }
+				if (in2DMode) { viewpointOffset2D = viewpointOffset; } else { viewpointOffset3D = viewpointOffset; }
 				changed = true;
 			}
 			Handles.DrawLine(target.position, viewpoint);
@@ -90,15 +100,16 @@ public class CameraHolder : MonoBehaviour {
 			if (EditorGUI.EndChangeCheck()) {
 				Vector3 offset = position - target.position;
 				Undo.RecordObject(this, "Offset");
-				if (is2D) { offset2D = offset; } else { offset3D = offset; }
+				if (in2DMode) { offset2D = offset; } else { offset3D = offset; }
 				changed = true;
 			}
 			Handles.DrawLine(target.position, position);
 
 			if (changed) {
-				if (is2D) { SetTo2DView(); } else { SetTo3DView(); }
+				if (in2DMode) { SetTo2DView(); } else { SetTo3DView(); }
 			}
 		}
 	}
 #endif
+
 }

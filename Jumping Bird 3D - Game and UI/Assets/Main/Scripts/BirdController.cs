@@ -48,30 +48,7 @@ public class BirdController : MonoBehaviour {
 		flapHash = Animator.StringToHash("Flap");
 		animator.SetBool(aliveHash, alive);
 		SetTurnLimit(0.8f, -1, 1); // test
-		SetDeadlyTags("Untagged", "WhatEver"); // test
 		SetRevivePositionAndRotation(rb.position, rb.rotation); // test
-		Revive(); // test
-	}
-
-	private void Update() {
-		if (Input.GetKeyDown(KeyCode.G)) {
-			Glide();
-		}
-		if (Input.GetKeyDown(KeyCode.J)) {
-			Jump();
-		}
-		if (Input.GetKeyDown(KeyCode.LeftArrow)) {
-			TurnLeft();
-		}
-		if (Input.GetKeyDown(KeyCode.RightArrow)) {
-			TurnRight();
-		}
-		if (Input.GetKeyDown(KeyCode.D)) {
-			Dash();
-		}
-		if (Input.GetKeyDown(KeyCode.R)) {
-			Revive();
-		}
 	}
 
 	private void FixedUpdate() {
@@ -164,7 +141,7 @@ public class BirdController : MonoBehaviour {
 		}
 	}
 
-	private System.Action OnDead;
+	public System.Action OnDead;
 	private void Die() {
 		alive = false;
 		animator.SetBool(aliveHash, false);
